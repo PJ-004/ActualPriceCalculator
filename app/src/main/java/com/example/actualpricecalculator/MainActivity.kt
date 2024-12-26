@@ -1,6 +1,7 @@
 package com.example.actualpricecalculator
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -16,9 +17,9 @@ class MainActivity : AppCompatActivity() {
 
     fun calculateSalePrice(currentPrice : Double) {
         if (!isEmpty) {
-            val sellPrice : Double = 7.25 * currentPrice
-            result.text = sellPrice.toString()
-            println(sellPrice)
+            val salePrice : Double = 7.25 * currentPrice
+            result.text = salePrice.toString()
+            println(salePrice)
         }
     }
 
@@ -32,11 +33,19 @@ class MainActivity : AppCompatActivity() {
         result = findViewById(R.id.result)
 
         if (!price.text.isEmpty()) {
+            price.requestFocus()
             isEmpty = true
+        } else {
+            isEmpty = false
         }
 
         button.setOnClickListener {
-            calculateSalePrice(price.toString().toDouble())
+            if (isEmpty) {
+                Log.i("You're", "fucked")
+            }
+            price.requestFocus()
+            Log.i("The current price is, ", price.text.toString())
+            calculateSalePrice(price.text.toString().trim().toDouble())
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
