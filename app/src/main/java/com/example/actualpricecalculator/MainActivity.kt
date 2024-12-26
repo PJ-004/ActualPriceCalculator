@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
     private lateinit var button : Button
@@ -17,9 +18,8 @@ class MainActivity : AppCompatActivity() {
 
     fun calculateSalePrice(currentPrice : Double) {
         if (!isEmpty) {
-            val salePrice : Double = (0.0725 * currentPrice) + currentPrice
+            val salePrice = (((0.09125 * currentPrice) + currentPrice) * 100).roundToInt()/100.0
             result.text = salePrice.toString()
-            println(salePrice)
         }
     }
 
@@ -40,11 +40,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         button.setOnClickListener {
-            if (isEmpty) {
-                Log.i("You're", "fucked")
-            }
-            price.requestFocus()
-            Log.i("The current price is, ", price.text.toString())
             calculateSalePrice(price.text.toString().trim().toDouble())
         }
 
