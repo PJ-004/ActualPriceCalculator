@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
 
     fun calculateSalePrice(currentPrice : Double) {
         if (!isEmpty) {
-            val salePrice : Double = 7.25 * currentPrice
+            val salePrice : Double = (0.0725 * currentPrice) + currentPrice
             result.text = salePrice.toString()
             println(salePrice)
         }
