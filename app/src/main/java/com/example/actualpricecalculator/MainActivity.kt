@@ -1,7 +1,7 @@
 package com.example.actualpricecalculator
 
+import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import kotlin.math.roundToInt
+import com.example.actualpricecalculator.database.DatabaseHelper
 
 class MainActivity : AppCompatActivity() {
     private lateinit var button : Button
@@ -16,9 +17,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var result : TextView
     private var isEmpty: Boolean = true
 
+    //var taxRates = DatabaseHelper(this)
+
     fun calculateSalePrice(currentPrice : Double) {
         if (!isEmpty) {
-            val salePrice = (((0.09125 * currentPrice) + currentPrice) * 100).roundToInt()/100.0
+            val salePrice = (((0.09125 * currentPrice) + currentPrice) * 100).roundToInt() / 100.0
             result.text = salePrice.toString()
         }
     }
