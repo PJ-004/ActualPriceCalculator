@@ -3,63 +3,59 @@ package com.example.actualpricecalculator.database
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import java.io.File
 import java.io.FileOutputStream
-import java.io.OutputStream
+import java.io.IOException
 
-class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
         private const val DATABASE_NAME = "SalesTaxDB.db"
         private const val DATABASE_VERSION = 1
-        private const val DATABASE_PATH = "app/src/main/assets/SalesTaxDB.db"
     }
 
-    private val dbPath = DATABASE_PATH + DATABASE_NAME
     private var database: SQLiteDatabase? = null
-    private val appContext = context
 
     init {
-        checkAndCopyDatabase()
+        copyDatabase()
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        // Not used as we are using an existing database
+        // No need to implement as we are using a preloaded database
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        // Not used as we are using an existing database
-    }
-
-    private fun checkAndCopyDatabase() {
-        val dbFile = appContext.getDatabasePath(DATABASE_NAME)
-        if (!dbFile.exists()) {
-            copyDatabase()
-        }
+        // No need to implement as we are using a preloaded database
     }
 
     private fun copyDatabase() {
-        val inputStream = appContext.assets.open(DATABASE_NAME)
-        val outputStream: OutputStream = FileOutputStream(dbPath)
+        val dbFile = context.getDatabasePath(DATABASE_NAME)
 
-        val buffer = ByteArray(1024)
-        var length: Int
-        while (inputStream.read(buffer).also { length = it } > 0) {
-            outputStream.write(buffer, 0, length)
+        if (!dbFile.exists()) {
+            try {
+                context.assets.open(DATABASE_NAME).use { inputStream ->
+                    FileOutputStream(dbFile).use { outputStream ->
+                        val buffer = ByteArray(1024)
+                        var length: Int
+                        while (inputStream.read(buffer).also { length = it } > 0) {
+                            outputStream.write(buffer, 0, length)
+                        }
+                        outputStream.flush()
+                    }
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+                throw RuntimeException("Error copying database", e)
+            }
         }
-
-        outputStream.flush()
-        outputStream.close()
-        inputStream.close()
     }
 
     fun openDatabase(): SQLiteDatabase {
-        if (database == null || !database!!.isOpen) {
-            database = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READWRITE)
-        }
+        val dbPath = context.getDatabasePath(DATABASE_NAME)
+        database = SQLiteDatabase.openDatabase(dbPath.path, null, SQLiteDatabase.OPEN_READWRITE)
         return database!!
     }
 
-    @Synchronized
     override fun close() {
         database?.close()
         super.close()
