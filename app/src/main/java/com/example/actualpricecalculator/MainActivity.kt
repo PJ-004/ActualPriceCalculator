@@ -3,6 +3,7 @@ package com.example.actualpricecalculator
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -20,8 +21,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var button : Button
     private lateinit var price : TextView
     private lateinit var result : TextView
-    private var isEmpty: Boolean = true
     private lateinit var cityList: List<String>
+
+    private var isEmpty: Boolean = true
+    private var currentCity: String = "Select Location"
 
     private fun initializeDropdownItems(): List<String> {
         val dbHelper = DatabaseHelper(this)
@@ -83,13 +86,20 @@ class MainActivity : AppCompatActivity() {
         price = findViewById(R.id.price)
         button = findViewById(R.id.button)
         result = findViewById(R.id.result)
-
         cityList = initializeDropdownItems()
-        val dropdown = findViewById<Spinner>(R.id.cityList)
-        val adapter = ArrayAdapter(this, cityList.lastIndex + 1, cityList)
+
+        val dropdown = findViewById<Spinner>(R.id.cityDropdown)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, cityList)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         dropdown.adapter = adapter
 
+        dropdown.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                currentCity = cityList[position]
+            }
 
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
 
         if (price.text.isEmpty()) {
             isEmpty = false
@@ -99,7 +109,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         button.setOnClickListener {
-            calculateSalePrice(price.text.toString().trim().toDouble(), "Cupertino")
+            if (!isEmpty) {
+                calculateSalePrice(price.text.toString().trim().toDouble(), currentCity)
+            }
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
