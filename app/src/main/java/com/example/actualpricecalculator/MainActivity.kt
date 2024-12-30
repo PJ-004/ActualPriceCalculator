@@ -1,7 +1,9 @@
 package com.example.actualpricecalculator
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.os.Bundle
+import android.os.DeadObjectException
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
@@ -15,7 +17,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowInsetsCompat
 import androidx.appcompat.app.AppCompatActivity
 import com.example.actualpricecalculator.database.DatabaseHelper
-
+import java.io.IOException
+import java.util.concurrent.CompletionException
 
 class MainActivity : AppCompatActivity() {
     private lateinit var button : Button
@@ -36,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         val cursor = database.rawQuery("SELECT Location FROM SalesTaxRates", arrayOf())
 
         if (cursor.moveToFirst()) {
-
             while (true) {
                 returnValue.add(cursor.getString(0))
 
@@ -46,8 +48,6 @@ class MainActivity : AppCompatActivity() {
 
                 cursor.moveToNext()
             }
-
-            println(returnValue)
         }
 
         cursor.close()
@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         var taxRate = 0.0
 
         val cursor = database.rawQuery("SELECT Rate FROM SalesTaxRates WHERE Location = '$location' OR County = '$location' AND Type = 'City' ", arrayOf())
-        Log.i("Location: ", location)
+        Log.i("Location: ", location)       // This log helps verify that the correct location has been selected
 
         if (cursor.moveToFirst()) {
             taxRate = cursor.getDouble(0)
@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity() {
         cursor.close()
         dbHelper.close()
         if (!isEmpty) {
+            // The division by 100 is done to return the value at 2 decimal points
             val salePrice = (((taxRate * currentPrice) + currentPrice) * 100).roundToInt() / 100.0
             result.text = salePrice.toString()
         }
@@ -109,8 +110,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         button.setOnClickListener {
-            if (!isEmpty) {
-                calculateSalePrice(price.text.toString().trim().toDouble(), currentCity)
+            try {
+                if (!isEmpty) {
+                    calculateSalePrice(price.text.toString().trim().toDouble(), currentCity)
+                }
+            } catch (e: NumberFormatException) {
+                val builder = AlertDialog.Builder(this)
+                builder.setMessage("Please enter a valid value for current price")
+                    .setPositiveButton("Ok") { dialog, _ ->
+                        dialog.cancel()
+                    }
+                builder.create()
             }
         }
 
