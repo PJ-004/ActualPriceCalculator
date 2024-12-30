@@ -3,7 +3,6 @@ package com.example.actualpricecalculator
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
-import android.os.DeadObjectException
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
@@ -17,13 +16,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowInsetsCompat
 import androidx.appcompat.app.AppCompatActivity
 import com.example.actualpricecalculator.database.DatabaseHelper
-import java.io.IOException
-import java.util.concurrent.CompletionException
 
 class MainActivity : AppCompatActivity() {
     private lateinit var button : Button
     private lateinit var price : TextView
     private lateinit var result : TextView
+    private lateinit var taxAndCity : TextView
     private lateinit var cityList: List<String>
 
     private var isEmpty: Boolean = true
@@ -32,7 +30,6 @@ class MainActivity : AppCompatActivity() {
     private fun initializeDropdownItems(): List<String> {
         val dbHelper = DatabaseHelper(this)
         val database = dbHelper.openDatabase()
-        var taxRate = 0.0
         val returnValue = mutableListOf<String>()
         returnValue.add("Select Location")
 
@@ -60,6 +57,7 @@ class MainActivity : AppCompatActivity() {
     private fun calculateSalePrice(currentPrice : Double, location : String) {
         val dbHelper = DatabaseHelper(this)
         val database = dbHelper.openDatabase()
+        val taxPercentage: Double
         var taxRate = 0.0
 
         val cursor = database.rawQuery("SELECT Rate FROM SalesTaxRates WHERE Location = '$location' OR County = '$location' AND Type = 'City' ", arrayOf())
@@ -67,6 +65,8 @@ class MainActivity : AppCompatActivity() {
 
         if (cursor.moveToFirst()) {
             taxRate = cursor.getDouble(0)
+            taxPercentage = taxRate * 100
+            taxAndCity.text = "The tax rate at $location is $taxPercentage%"
             println(taxRate)
         }
 
@@ -87,6 +87,7 @@ class MainActivity : AppCompatActivity() {
         price = findViewById(R.id.price)
         button = findViewById(R.id.button)
         result = findViewById(R.id.result)
+        taxAndCity = findViewById(R.id.DisplayText)
         cityList = initializeDropdownItems()
 
         val dropdown = findViewById<Spinner>(R.id.cityDropdown)
