@@ -3,7 +3,6 @@ package com.example.actualpricecalculator.database
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
@@ -16,17 +15,15 @@ class DatabaseHelper(private val context: Context) : SQLiteOpenHelper(context, D
 
     private var database: SQLiteDatabase? = null
 
+    // Since the database already exists, it is necessary to copy it to the Kotlin app so that it can be accessed
     init {
         copyDatabase()
     }
 
-    override fun onCreate(db: SQLiteDatabase?) {
-        // No need to implement as we are using a preloaded database
-    }
-
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        // No need to implement as we are using a preloaded database
-    }
+    // onCreate and onUpgrade do not need to be implemented as we are using a preloaded database
+    // These are required to be declared by SQLiteOpenHelper, otherwise it would throw an error
+    override fun onCreate(db: SQLiteDatabase?) {}
+    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {}
 
     private fun copyDatabase() {
         val dbFile = context.getDatabasePath(DATABASE_NAME)
