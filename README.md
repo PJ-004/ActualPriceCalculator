@@ -16,3 +16,6 @@ You need to have git installed on your PC to clone it.
 2. Clone this repository by entering the command `git clone https://github.com/PJ-004/ActualPriceCalculator`
 3. In Android Studio go to File -> New -> Import Project and then select ActualPriceCalculator from the directory you placed it in
 4. After the project opens up, Gradle will start building the dependencies required, you can then build the project under the build menu
+
+## Acknowledgements
+SalesTaxDB.db data was obtained from the website https://www.cdtfa.ca.gov/taxes-and-fees/rates.aspx
