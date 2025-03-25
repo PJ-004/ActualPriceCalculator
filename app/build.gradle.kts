@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.actualpricecalculator"
+    namespace = "com.truePriceCA.actualpricecalculator"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.actualpricecalculator"
+        applicationId = "com.truePriceCA.actualpricecalculator"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
